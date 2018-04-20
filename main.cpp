@@ -35,17 +35,17 @@ std::string WstringToString(const std::wstring & src_wstr) {
 
 
 int main() {
-    std::string str = "今天你好";
+    std::string str = "今天你好，。#！";
     std::wstring wstr = StringToWstring(str);
 
-    //std::wcout << wstr << std::endl;
-    //std::wcout << wstr.length() << std::endl;
+    std::wcout << wstr << std::endl;
+    std::wcout << wstr.length() << std::endl;
     
-    wstr = L"今天你好";
+    wstr = L"今天你好，。#！";
     str = WstringToString(wstr);
 
-    std::cout << str << std::endl;
-    std::cout << str.length() << std::endl;
+    //std::cout << str << std::endl;
+    //std::cout << str.length() << std::endl;
 
     return 0;
 }
