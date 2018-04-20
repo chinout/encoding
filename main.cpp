@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 std::wstring StringToWstring(const std::string& src_str) {
-    unsigned max_len = src_str.size() * 2;
+    size_t max_len = src_str.size() * 2;
     setlocale(LC_CTYPE, "");
     wchar_t* dst_wstr = new wchar_t[max_len];
 #ifdef _WIN32
@@ -19,7 +19,7 @@ std::wstring StringToWstring(const std::string& src_str) {
 }
 
 std::string WstringToString(const std::wstring & src_wstr) {
-    unsigned max_len = src_wstr.size() * 4;
+    size_t max_len = src_wstr.size() * 4;
     setlocale(LC_CTYPE, "");
     char* dst_str = new char[max_len];
 #ifdef _WIN32
