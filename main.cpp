@@ -1,115 +1,136 @@
-#include <iostream>
-#include <string>
-#include <clocale>
-#include <cstdlib>
 #include <cstring>
+#include <cstdio>
+#include <iostream>
+#include <cerrno>
+#include <locale>
 
-bool Str2Wstr(const std::string & str, std::wstring & wstr)
-{
-    size_t max_len = str.size() * 2;
-    setlocale(LC_CTYPE, "");
-    wchar_t* dst_wstr = new wchar_t[max_len];
-#ifdef _WIN32
-    size_t out_size;
-    int ret = mbstowcs_s(&out_size, dst_wstr, max_len, str.c_str(), max_len);
-    if(ret != 0)
-    {
-        delete[] dst_wstr;
-        return false;
-    }
+#ifdef WINDOWS
+#include <windows.h>
+#include <ctype.h>
 #else
-    size_t ret = mbstowcs(dst_wstr, str.c_str(), max_len);
-    std::cerr << ret << std::endl;
-    std::cerr << static_cast<size_t>(-1) << std::endl;
-
-    if(ret == static_cast<size_t>(-1))
-    {
-        delete[] dst_wstr;
-        return false;
-    }
+#include <iconv.h>
 #endif
-    wstr = dst_wstr;
-    delete[] dst_wstr;
 
-    return true;
+
+
+//wchar_t转成UTF-8
+int W2UTF8Convert( const wchar_t* c_str, int a_nSrcSize, char* a_szDest, int a_nDestSize )
+{
+#ifdef WINDOWS
+    return WideCharToMultiByte( CP_UTF8, 0, c_str, -1, a_szDest, a_nDestSize, NULL, NULL );
+#else
+    size_t result;
+    iconv_t env;
+    env = iconv_open("UTF-8","WCHAR_T");
+    if (env==(iconv_t)-1)
+    {
+        printf("iconv_open WCHAR_T->UTF8 error%s %d/n",strerror(errno),errno) ;
+        return -1;
+    }
+    result = iconv(env,(char**)&c_str,(size_t*)&a_nSrcSize,(char**)&a_szDest,(size_t*)&a_nDestSize);
+    if (result==(size_t)-1)
+    {
+        printf("iconv WCHAR_T->UTF8 error %d/n",errno) ;
+        return -1;
+    }
+    iconv_close(env);
+    return (int)result;
+#endif
 }
 
-bool Wstr2Str(const std::wstring & wstr, std::string & str)
+/*
+//UTF-8转成wchar_t
+int UTF82WConvert(char* c_str, std::wstring * wstr)
 {
-    size_t max_len = wstr.size() * 4;
-    setlocale(LC_CTYPE, "");
-    char* dst_str = new char[max_len];
-#ifdef _WIN32
-    size_t out_size;
-    int ret = wcstombs_s(&out_size, dst_str, max_len, wstr.c_str(), max_len);
-    if(ret != 0)
-    {
-        delete[] dst_str;
-        return false;
-    }
+#ifdef WINDOWS
+    int wcs_len = MultiByteToWideChar(CP_UTF8, 0, c_str, -1, NULL, 0);
+    wchar_t * wcs = new wchar_t[wcs_len];
+    memset(wcs, 0, sizeof(wchar_t) * wcs_len);
+    MultiByteToWideChar(CP_UTF8, 0, c_str, -1, wcs, wcs_len);
+    *wstr = wcs;
+    delete[] wcs;
+    wcs = nullptr;
 #else
-    size_t ret = wcstombs(dst_str, wstr.c_str(),max_len);
-    std::cerr << ret << std::endl;
-    std::cerr << static_cast<size_t>(-1) << std::endl;
-    if(ret == static_cast<size_t>(-1)) {
-        delete[] dst_str;
-        return false;
+    size_t result;
+    iconv_t env;
+    int size = strlen(c_str) + 1;
+    env = iconv_open("WCHAR_T","UTF-8");
+    if (env==(iconv_t)-1)
+    {
+        printf("iconv_open UTF8->WCHAR_T error %d/n",errno) ;
+        return -1;
     }
-#endif
-    str = dst_str;
-    delete[] dst_str;
 
-    return true;
+    size_t wcs_len = size * 2;
+    wchar_t * wcs = new wchar_t[wcs_len];
+    memset(wcs, 0, sizeof(wchar_t) * wcs_len);
+    result = iconv(env, (char**)&c_str, (size_t*)&size,
+                   (char**)&wcs, (size_t*)&wcs_len);
+    if (result==(size_t)-1)
+    {
+        printf("iconv UTF8->WCHAR_T error %d/n",errno) ;
+        return -1;
+    }
+
+    *wstr = wcs;
+    delete[] wcs;
+    wcs = nullptr;
+    iconv_close(env);
+    return (int)result;
+#endif
 }
+
+bool UTF82Wstr(const std::string & utf8_str, std::wstring * wstr)
+{
+}
+*/
 
 
 int main() {
+    std::setlocale(LC_ALL, "");
+    std::wcout << L"LC_CTYPE: " << std::setlocale(LC_CTYPE, NULL) << std::endl;
+    //std::wcout.imbue(std::locale("zh_CN.UTF-8"));
 
-    {
-        std::string str = "今天你好，。#！";
-        std::wstring wstr;
-        bool ret = Str2Wstr(str, wstr);
+    char c_str[] = "今天。，！";
+    std::wstring wstr;
 
-        std::wcout << std::boolalpha << ret << std::endl;
-        if(ret)
-        {
-            std::wcout << wstr << std::endl;
-            std::wcout << wstr.length() << std::endl;
-        }
+
+    iconv_t env;
+    env = iconv_open("WCHAR_T","UTF-8");
+    if (env == (iconv_t) - 1) {
+        printf("iconv_open UTF8->WCHAR_T error %d/n", errno) ;
+        return -1;
     }
 
-    {
-        srand(time(NULL));
-        char buffer[1024];
-        memset(buffer, 0, 1024);
-        for(int i = 0; i < 1023; ++i)
-        {
-            buffer[i] = rand() % 256;
-        }
-        std::string str(buffer, 1024);
+    size_t c_str_size = strlen(c_str);
+    size_t wcs_len = (c_str_size + 1) * sizeof(wchar_t);
+    wchar_t * wcs = new wchar_t[wcs_len];
+    memset(wcs, 0, sizeof(wchar_t) * wcs_len);
 
-        std::wstring wstr;
-        bool ret = Str2Wstr(str, wstr);
+    char* iconv_in = (char*)&c_str[0];
+    char* iconv_out = (char*)wcs;
 
-        std::wcout << std::boolalpha << ret << std::endl;
-        if(ret)
-        {
-            std::wcout << wstr << std::endl;
-            std::wcout << wstr.length() << std::endl;
-        }
+    std::wcout << wcs_len << std::endl;
+
+    size_t result = iconv(env, &iconv_in, &c_str_size,
+                          &iconv_out, &wcs_len);
+    if (result == (size_t) - 1) {
+        printf("iconv UTF8->WCHAR_T error %d/n",errno) ;
+        return -1;
     }
 
-    {
-        /*
-        std::wstring wstr = L"今天你好，。#！";
-        std::string str;
-        bool ret = Wstr2Str(wstr, str);
+    std::wcout << wcs_len << std::endl;
 
-        std::cout << str << std::endl;
-        std::cout << str.length() << std::endl;
-        }
-        */
+    wstr = wcs;
+    delete[] wcs;
+    wcs = nullptr;
+
+    iconv_close(env);
+
+    std::wcout << wstr << std::endl;
+    std::wcout << wstr.length() << std::endl;
+
+    for(size_t i = 0; i < wstr.length(); ++i) {
+        std::wcout << L"U+" << std::hex << (long)wstr.at(i) << std::endl;
     }
-
-    return 0;
 }
