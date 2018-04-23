@@ -26,16 +26,17 @@ bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
                                   out_str, out_str_bytes, NULL, NULL);
     if (ret == 0) {
         delete[] out_str;
+        out_str = NULL;
         return false;
     }
     *str = out_str;
     delete[] out_str;
+    out_str = NULL;
     return true;
 #else
     iconv_t env;
     env = iconv_open("UTF-8", "WCHAR_T");
     if (env == (iconv_t)-1) {
-        perror("iconv");
         return -1;
     }
 
@@ -85,18 +86,18 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
                                   -1, out_wstr, out_wstr_bytes);
     if (ret == 0) {
         delete[] out_wstr;
+        out_wstr = NULL;
         return false;
     }
     *wstr = out_wstr;
     delete[] out_wstr;
-    out_wstr = nullptr;
+    out_wstr = NULL;
 
     return true;
 #else
     iconv_t env;
     env = iconv_open("WCHAR_T","UTF-8");
     if (env == (iconv_t) - 1) {
-        printf("iconv_open UTF8->WCHAR_T error %d/n", errno);
         return false;
     }
 
@@ -115,7 +116,9 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
     size_t result = iconv(env, &iconv_in, &str_bytes,
                           &iconv_out, &wc_str_bytes);
     if (result == (size_t) - 1) {
+        perror("iconv");
         delete[] wc_str;
+        wc_str = nullptr;
         return false;
     }
 
