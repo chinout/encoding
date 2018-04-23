@@ -13,70 +13,10 @@
 #include <iconv.h>
 #endif
 
-// wchar_t 转成 GBK(Win32)/UTF-8(Linux)
-bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 #ifdef _WIN32
-    int out_str_bytes = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1,
-                                      NULL, 0, NULL, NULL);
-    size_t out_str_len = out_str_bytes / sizeof(char);
-    if(out_str_len * sizeof(char) < out_str_bytes) {
-        ++out_str_len;
-    }
-    char * out_str = new char[out_str_len];
-    out_str_bytes = (int)out_str_len * sizeof(char);
-    memset(out_str, 0, out_str_bytes);
-    int ret = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1,
-                                  out_str, out_str_bytes, NULL, NULL);
-    if (ret == 0) {
-        delete[] out_str;
-        out_str = NULL;
-        return false;
-    }
-    *str = out_str;
-    delete[] out_str;
-    out_str = NULL;
-    return true;
-#else
-    iconv_t env;
-    env = iconv_open("UTF-8", "WCHAR_T");
-    if (env == (iconv_t)-1) {
-        return -1;
-    }
-
-
-    size_t wstr_len = wstr.length();
-    size_t c_str_len = wstr_len * sizeof(wchar_t) + 1;
-    char * c_str = new char[c_str_len];
-    size_t c_str_bytes = c_str_len * sizeof(char);
-    memset(c_str, 0, c_str_bytes);
-
-    char * iconv_in = (char *)&wstr.c_str()[0];
-    char * iconv_out = (char *)c_str;
-    size_t wstr_bytes = wstr_len * sizeof(wchar_t);
-
-    std::cout << wstr_bytes << std::endl;
-    std::cout << c_str_bytes << std::endl;
-    size_t result = iconv(env, (char**)&iconv_in, (size_t*)&wstr_bytes,
-                          (char**)&iconv_out, (size_t*)&c_str_bytes);
-    if (result == (size_t)-1) {
-        perror("iconv");
-        delete[] c_str;
-        c_str = nullptr;
-        return false;
-    }
-    *str = c_str;
-    delete[] c_str;
-    c_str = nullptr;
-    iconv_close(env);
-
-    return true;
-#endif    // _WIN32
-}
-
-// GBK(Win32)/UTF-8(Linux) 转成 wchar_t
-bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
-#ifdef _WIN32
-    size_t out_wstr_len = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
+bool Str2Wstr(const std::string & str, const unsigned int & code_page,
+              std::wstring* wstr) {
+    size_t out_wstr_len = MultiByteToWideChar(code_page, 0, str.c_str(),
                                              -1, NULL, 0);
 	//return false;
     wchar_t * out_wstr = new wchar_t[out_wstr_len];
@@ -84,7 +24,7 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
     memset(out_wstr, 0, out_wstr_size);
 	std::wcout << out_wstr_size << std::endl;
 	std::wcout << out_wstr_len << std::endl;
-    int ret = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
+    int ret = MultiByteToWideChar(code_page, 0, str.c_str(),
                                   -1, out_wstr, out_wstr_size);
     if (ret == 0) {
         delete[] out_wstr;
@@ -96,6 +36,46 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
     out_wstr = NULL;
 
     return true;
+
+}
+
+bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
+              std::string* str) {
+    int out_str_bytes = WideCharToMultiByte(code_page, 0, wstr.c_str(), -1,
+                                      NULL, 0, NULL, NULL);
+    size_t out_str_len = out_str_bytes / sizeof(char);
+    if(out_str_len * sizeof(char) < out_str_bytes) {
+        ++out_str_len;
+    }
+    char * out_str = new char[out_str_len];
+    out_str_bytes = (int)out_str_len * sizeof(char);
+    memset(out_str, 0, out_str_bytes);
+    int ret = WideCharToMultiByte(code_page, 0, wstr.c_str(), -1,
+                                  out_str, out_str_bytes, NULL, NULL);
+    if (ret == 0) {
+        delete[] out_str;
+        out_str = NULL;
+        return false;
+    }
+    *str = out_str;
+    delete[] out_str;
+    out_str = NULL;
+    return true;
+}
+
+
+bool GBK2Wstr(const std::string& str, std::wstring* wstr) {
+    return Str2Wstr(str, CP_ACP, wstr);
+}
+
+bool Wstr2GBK(const std::wstring& wstr, std::string* str) {
+    return Wstr2Str(wstr, CP_ACP, str);
+}
+#endif    // _WIN32
+
+bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
+#ifdef _WIN32
+    return Str2Wstr(str, CP_UTF8, wstr);
 #else
     iconv_t env;
     env = iconv_open("WCHAR_T","UTF-8");
@@ -136,5 +116,44 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #endif    // _WIN32
 }
 
+bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
+#ifdef _WIN32
+    return Wstr2Str(wstr, CP_UTF8, str);
+#else
+    iconv_t env;
+    env = iconv_open("UTF-8", "WCHAR_T");
+    if (env == (iconv_t)-1) {
+        return -1;
+    }
+
+
+    size_t wstr_len = wstr.length();
+    size_t c_str_len = wstr_len * sizeof(wchar_t) + 1;
+    char * c_str = new char[c_str_len];
+    size_t c_str_bytes = c_str_len * sizeof(char);
+    memset(c_str, 0, c_str_bytes);
+
+    char * iconv_in = (char *)&wstr.c_str()[0];
+    char * iconv_out = (char *)c_str;
+    size_t wstr_bytes = wstr_len * sizeof(wchar_t);
+
+    std::cout << wstr_bytes << std::endl;
+    std::cout << c_str_bytes << std::endl;
+    size_t result = iconv(env, (char**)&iconv_in, (size_t*)&wstr_bytes,
+                          (char**)&iconv_out, (size_t*)&c_str_bytes);
+    if (result == (size_t)-1) {
+        perror("iconv");
+        delete[] c_str;
+        c_str = nullptr;
+        return false;
+    }
+    *str = c_str;
+    delete[] c_str;
+    c_str = nullptr;
+    iconv_close(env);
+
+    return true;
+#endif    // _WIN32
+}
 
 #endif    // ENCODING_ENCODING_H_
