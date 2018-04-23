@@ -1,3 +1,6 @@
+#ifndef ENCODING_ENCODING_H_
+#define ENCODING_ENCODING_H_
+
 #include <cstring>
 #include <cstdio>
 #include <iostream>
@@ -10,7 +13,7 @@
 #include <iconv.h>
 #endif
 
-// wchar_t 转成 UTF-8
+// wchar_t 转成 GBK(Win32)/UTF-8(Linux)
 bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 #ifdef _WIN32
     int out_str_bytes = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1,
@@ -67,10 +70,10 @@ bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
     iconv_close(env);
 
     return true;
-#endif
+#endif    // _WIN32
 }
 
-// UTF-8 转成 wchar_t
+// GBK(Win32)/UTF-8(Linux) 转成 wchar_t
 bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #ifdef _WIN32
     size_t out_wstr_len = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
@@ -130,5 +133,8 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
     iconv_close(env);
 
     return true;
-#endif
+#endif    // _WIN32
 }
+
+
+#endif    // ENCODING_ENCODING_H_
