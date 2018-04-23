@@ -3,6 +3,7 @@
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <fstream>
 
 #include "encoding.h"
 
@@ -25,6 +26,7 @@ int main() {
         std::cout << std::boolalpha << std::endl;
     }
 
+    /*
     std::srand((unsigned int)time(NULL));
     wchar_t buffer[1024];
     memset(buffer, 0, 1024);
@@ -44,6 +46,21 @@ int main() {
     } else {
         std::cout << std::boolalpha << std::endl;
     }
+    */
 
-	getchar();
+    std::string filename("std.txt");
+    std::ofstream fout(filename.c_str());
+    if(fout) {
+        std::wstring wstr = L"测试所以这样就可以了吧，。……今天。，！";
+        std::string str;
+        bool ret = Wstr2UTF8(wstr, &str);
+        if (ret) {
+            std::cout << str.length() << std::endl;
+            std::cout << str << std::endl;
+
+            fout << str << std::endl;
+        } else {
+            std::cout << std::boolalpha << std::endl;
+        }
+    }
 }
