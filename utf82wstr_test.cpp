@@ -3,6 +3,7 @@
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <fstream>
 
 #include "encoding.h"
 
@@ -32,7 +33,9 @@ int main() {
     for(size_t i = 0; i < wstr.length(); ++i) {
         std::wcout << L"U+" << std::hex << (long)wstr.at(i) << std::endl;
     }
+    std::wcout << std::dec;
 
+    /*
     std::srand((unsigned int)time(NULL));
     char buffer[1024];
     memset(buffer, 0, 1024);
@@ -52,6 +55,22 @@ int main() {
     } else {
         std::wcout << std::boolalpha << false << std::endl;
     }
+    */
 
-	getchar();
+    std::string filename("std.txt");
+    std::ifstream fin(filename);
+    if(fin) {
+        std::string file_content((std::istreambuf_iterator<char>(fin)),
+                                 std::istreambuf_iterator<char>());
+
+        std::wstring wstr;
+        bool ret = UTF82Wstr(file_content, &wstr);
+        if(ret) {
+            std::wcout << wstr;
+            std::wcout << wstr.length() << std::endl;
+        } else {
+            std::wcout << std::boolalpha << false << std::endl;
+        }
+    }
+
 }
