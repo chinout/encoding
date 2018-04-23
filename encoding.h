@@ -13,16 +13,16 @@
 // wchar_t 转成 UTF-8
 bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 #ifdef _WIN32
-    int out_str_bytes = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1,
+    int out_str_bytes = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1,
                                       NULL, 0, NULL, NULL);
     size_t out_str_len = out_str_bytes / sizeof(char);
     if(out_str_len * sizeof(char) < out_str_bytes) {
         ++out_str_len;
     }
-    char out_str = new char[out_str_len];
-    out_str_bytes = out_str_len * sizeof(char);
+    char * out_str = new char[out_str_len];
+    out_str_bytes = (int)out_str_len * sizeof(char);
     memset(out_str, 0, out_str_bytes);
-    int ret = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1,
+    int ret = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1,
                                   out_str, out_str_bytes, NULL, NULL);
     if (ret == 0) {
         delete[] out_str;
@@ -73,17 +73,16 @@ bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 // UTF-8 转成 wchar_t
 bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #ifdef _WIN32
-    int out_wstr_bytes = MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
+    size_t out_wstr_len = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
                                              -1, NULL, 0);
-    size_t out_wstr_len = out_wstr_bytes / sizeof(wchar_t);
-    if (out_wstr_len * sizeof(wchar_t) < out_wstr_bytes) {
-        ++out_wstr_len;
-    }
+	//return false;
     wchar_t * out_wstr = new wchar_t[out_wstr_len];
-    out_wstr_bytes = out_wstr_len * sizeof(wchar_t);
-    memset(out_wstr, 0, out_wstr_bytes);
-    int ret = MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
-                                  -1, out_wstr, out_wstr_bytes);
+    int out_wstr_size = (int)out_wstr_len * sizeof(wchar_t);
+    memset(out_wstr, 0, out_wstr_size);
+	std::wcout << out_wstr_size << std::endl;
+	std::wcout << out_wstr_len << std::endl;
+    int ret = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
+                                  -1, out_wstr, out_wstr_size);
     if (ret == 0) {
         delete[] out_wstr;
         out_wstr = NULL;

@@ -7,8 +7,8 @@
 #include "encoding.h"
 
 int main() {
-    std::setlocale(LC_ALL, "");
-    std::cout << "LC_CTYPE: " << std::setlocale(LC_CTYPE, NULL) << std::endl;
+    setlocale(LC_ALL, "");
+    std::cout << "LC_CTYPE: " << setlocale(LC_CTYPE, NULL) << std::endl;
 
     std::wstring wstr = L"测试所以这样就可以了吧，。……今天。，！";
     std::string str;
@@ -21,7 +21,7 @@ int main() {
         std::cout << std::boolalpha << std::endl;
     }
 
-    std::srand(time(NULL));
+    std::srand((unsigned int)time(NULL));
     wchar_t buffer[1024];
     memset(buffer, 0, 1024);
     for (int i = 0; i < 1023; ++i) {
@@ -36,4 +36,6 @@ int main() {
     } else {
         std::cout << std::boolalpha << std::endl;
     }
+
+	getchar();
 }

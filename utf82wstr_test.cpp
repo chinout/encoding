@@ -7,9 +7,12 @@
 #include "encoding.h"
 
 int main() {
-    std::setlocale(LC_ALL, "");
-    std::wcout << L"LC_CTYPE: " << std::setlocale(LC_CTYPE, NULL) << std::endl;
-    //std::wcout.imbue(std::locale("zh_CN.UTF-8"));
+    setlocale(LC_ALL, "");
+    std::wcout << L"LC_CTYPE: " << setlocale(LC_CTYPE, NULL) << std::endl;
+    //std::wcout.imbue(std::locale("Chinese (Simplified)_China.936"));
+
+	std::wstring test_str = L"今天测试";
+	std::wcout << test_str << std::endl;
 
     std::string str = "测试所以这样就可以了吧，。……今天。，！";
     std::wstring wstr;
@@ -26,7 +29,7 @@ int main() {
         std::wcout << L"U+" << std::hex << (long)wstr.at(i) << std::endl;
     }
 
-    std::srand(time(NULL));
+    /*std::srand((unsigned int)time(NULL));
     char buffer[1024];
     memset(buffer, 0, 1024);
     for (int i = 0; i < 1023; ++i) {
@@ -40,5 +43,7 @@ int main() {
         std::wcout << wstr.length() << std::endl;
     } else {
         std::wcout << std::boolalpha << false << std::endl;
-    }
+    }*/
+
+	getchar();
 }
