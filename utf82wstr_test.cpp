@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <locale>
 #include <string>
 #include <ctime>
@@ -17,7 +17,11 @@ int main() {
     std::string str = "测试所以这样就可以了吧，。……今天。，！";
     std::wstring wstr;
 
+#ifdef _WIN32
+    bool ret = GBK2Wstr(str, &wstr);
+#else
     bool ret = UTF82Wstr(str, &wstr);
+#endif
     if(ret) {
         std::wcout << wstr << std::endl;
         std::wcout << wstr.length() << std::endl;
@@ -29,7 +33,7 @@ int main() {
         std::wcout << L"U+" << std::hex << (long)wstr.at(i) << std::endl;
     }
 
-    /*std::srand((unsigned int)time(NULL));
+    std::srand((unsigned int)time(NULL));
     char buffer[1024];
     memset(buffer, 0, 1024);
     for (int i = 0; i < 1023; ++i) {
@@ -37,13 +41,17 @@ int main() {
     }
     std::string word_str(buffer, 1024);
 
+#ifdef _WIN32
+    ret = GBK2Wstr(word_str, &wstr);
+#else
     ret = UTF82Wstr(word_str, &wstr);
+#endif
     if(ret) {
         std::wcout << wstr << std::endl;
         std::wcout << wstr.length() << std::endl;
     } else {
         std::wcout << std::boolalpha << false << std::endl;
-    }*/
+    }
 
 	getchar();
 }

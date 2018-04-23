@@ -13,7 +13,11 @@ int main() {
     std::wstring wstr = L"测试所以这样就可以了吧，。……今天。，！";
     std::string str;
 
+#ifdef _WIN32
+    bool ret = Wstr2GBK(wstr, &str);
+#else
     bool ret = Wstr2UTF8(wstr, &str);
+#endif
     if (ret) {
         std::cout << str.length() << std::endl;
         std::cout << str << std::endl;
@@ -29,7 +33,11 @@ int main() {
     }
     std::wstring word_str(buffer, 1024);
 
+#ifdef _WIN32
+    ret = Wstr2GBK(word_str, &str);
+#else
     ret = Wstr2UTF8(word_str, &str);
+#endif    // _WIN32
     if (ret) {
         std::cout << str.length() << std::endl;
         std::cout << str << std::endl;
