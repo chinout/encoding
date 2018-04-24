@@ -14,7 +14,7 @@
 #endif
 
 #ifdef _WIN32
-bool Str2Wstr(const std::string & str, const unsigned int & code_page,
+static bool Str2Wstr(const std::string & str, const unsigned int & code_page,
               std::wstring* wstr) {
     size_t out_wstr_len = MultiByteToWideChar(code_page, 0, str.c_str(),
                                              -1, NULL, 0);
@@ -39,7 +39,7 @@ bool Str2Wstr(const std::string & str, const unsigned int & code_page,
 
 }
 
-bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
+static bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
               std::string* str) {
     int out_str_bytes = WideCharToMultiByte(code_page, 0, wstr.c_str(), -1,
                                       NULL, 0, NULL, NULL);
@@ -64,16 +64,16 @@ bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
 }
 
 
-bool GBK2Wstr(const std::string& str, std::wstring* wstr) {
+static bool GBK2Wstr(const std::string& str, std::wstring* wstr) {
     return Str2Wstr(str, CP_ACP, wstr);
 }
 
-bool Wstr2GBK(const std::wstring& wstr, std::string* str) {
+static bool Wstr2GBK(const std::wstring& wstr, std::string* str) {
     return Wstr2Str(wstr, CP_ACP, str);
 }
 #endif    // _WIN32
 
-bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
+static bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #ifdef _WIN32
     return Str2Wstr(str, CP_UTF8, wstr);
 #else
@@ -116,7 +116,7 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #endif    // _WIN32
 }
 
-bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
+static bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 #ifdef _WIN32
     return Wstr2Str(wstr, CP_UTF8, str);
 #else
