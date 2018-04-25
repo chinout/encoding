@@ -44,7 +44,7 @@ static bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
     int out_str_bytes = WideCharToMultiByte(code_page, 0, wstr.c_str(), -1,
                                       NULL, 0, NULL, NULL);
     size_t out_str_len = out_str_bytes / sizeof(char);
-    if(out_str_len * sizeof(char) < out_str_bytes) {
+    if(out_str_len * sizeof(char) < (size_t)out_str_bytes) {
         ++out_str_len;
     }
     char * out_str = new char[out_str_len];
