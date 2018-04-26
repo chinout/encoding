@@ -1,6 +1,3 @@
-#ifndef ENCODING_ENCODING_H_
-#define ENCODING_ENCODING_H_
-
 #include <cstring>
 #include <cstdio>
 #include <iostream>
@@ -14,7 +11,7 @@
 #endif
 
 #ifdef _WIN32
-static bool Str2Wstr(const std::string & str, const unsigned int & code_page,
+bool Str2Wstr(const std::string & str, const unsigned int & code_page,
               std::wstring* wstr) {
     size_t out_wstr_len = MultiByteToWideChar(code_page, 0, str.c_str(),
                                              -1, NULL, 0);
@@ -39,7 +36,7 @@ static bool Str2Wstr(const std::string & str, const unsigned int & code_page,
 
 }
 
-static bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
+bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
               std::string* str) {
     int out_str_bytes = WideCharToMultiByte(code_page, 0, wstr.c_str(), -1,
                                       NULL, 0, NULL, NULL);
@@ -64,16 +61,16 @@ static bool Wstr2Str(const std::wstring & wstr, const unsigned int& code_page,
 }
 
 
-static bool GBK2Wstr(const std::string& str, std::wstring* wstr) {
+bool GBK2Wstr(const std::string& str, std::wstring* wstr) {
     return Str2Wstr(str, CP_ACP, wstr);
 }
 
-static bool Wstr2GBK(const std::wstring& wstr, std::string* str) {
+bool Wstr2GBK(const std::wstring& wstr, std::string* str) {
     return Wstr2Str(wstr, CP_ACP, str);
 }
 #endif    // _WIN32
 
-static bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
+bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #ifdef _WIN32
     return Str2Wstr(str, CP_UTF8, wstr);
 #else
@@ -116,7 +113,7 @@ static bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
 #endif    // _WIN32
 }
 
-static bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
+bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
 #ifdef _WIN32
     return Wstr2Str(wstr, CP_UTF8, str);
 #else
@@ -155,5 +152,3 @@ static bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
     return true;
 #endif    // _WIN32
 }
-
-#endif    // ENCODING_ENCODING_H_
