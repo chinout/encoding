@@ -1,6 +1,6 @@
 #include <cstring>
 #include <cstdio>
-#include <iostream>
+//#include <iostream>
 #include <cerrno>
 #include <locale>
 
@@ -19,8 +19,8 @@ bool Str2Wstr(const std::string & str, const unsigned int & code_page,
     wchar_t * out_wstr = new wchar_t[out_wstr_len];
     int out_wstr_size = (int)out_wstr_len * sizeof(wchar_t);
     memset(out_wstr, 0, out_wstr_size);
-	std::wcout << out_wstr_size << std::endl;
-	std::wcout << out_wstr_len << std::endl;
+	//std::wcout << out_wstr_size << std::endl;
+	//std::wcout << out_wstr_len << std::endl;
     int ret = MultiByteToWideChar(code_page, 0, str.c_str(),
                                   -1, out_wstr, out_wstr_size);
     if (ret == 0) {
@@ -90,7 +90,7 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
     char* iconv_out = (char*)wc_str;
     size_t str_bytes = str_len * sizeof(char);
 
-    std::wcout << wc_str_bytes << std::endl;
+    //std::wcout << wc_str_bytes << std::endl;
 
     size_t result = iconv(env, &iconv_in, &str_bytes,
                           &iconv_out, &wc_str_bytes);
@@ -101,7 +101,7 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr) {
         return false;
     }
 
-    std::wcout << wc_str_bytes << std::endl;
+    //std::wcout << wc_str_bytes << std::endl;
 
     *wstr = wc_str;
     delete[] wc_str;
@@ -134,8 +134,8 @@ bool Wstr2UTF8(const std::wstring & wstr, std::string * str) {
     char * iconv_out = (char *)c_str;
     size_t wstr_bytes = wstr_len * sizeof(wchar_t);
 
-    std::cout << wstr_bytes << std::endl;
-    std::cout << c_str_bytes << std::endl;
+    //std::cout << wstr_bytes << std::endl;
+    //std::cout << c_str_bytes << std::endl;
     size_t result = iconv(env, (char**)&iconv_in, (size_t*)&wstr_bytes,
                           (char**)&iconv_out, (size_t*)&c_str_bytes);
     if (result == (size_t)-1) {
