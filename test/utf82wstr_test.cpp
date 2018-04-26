@@ -19,9 +19,9 @@ int main() {
     std::wstring wstr;
 
 #ifdef _WIN32
-    bool ret = GBK2Wstr(str, &wstr);
+    bool ret = yu::GBK2Wstr(str, &wstr);
 #else
-    bool ret = UTF82Wstr(str, &wstr);
+    bool ret = yu::UTF82Wstr(str, &wstr);
 #endif
     if(ret) {
         std::wcout << wstr << std::endl;
@@ -45,9 +45,9 @@ int main() {
     std::string word_str(buffer, 1024);
 
 #ifdef _WIN32
-    ret = GBK2Wstr(word_str, &wstr);
+    ret = yu::GBK2Wstr(word_str, &wstr);
 #else
-    ret = UTF82Wstr(word_str, &wstr);
+    ret = yu::UTF82Wstr(word_str, &wstr);
 #endif
     if(ret) {
         std::wcout << wstr << std::endl;
@@ -64,7 +64,7 @@ int main() {
                                  std::istreambuf_iterator<char>());
 
         std::wstring wstr;
-        bool ret = UTF82Wstr(file_content, &wstr);
+        bool ret = yu::UTF82Wstr(file_content, &wstr);
         if(ret) {
             std::wcout << wstr;
             std::wcout << wstr.length() << std::endl;
