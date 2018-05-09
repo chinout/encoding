@@ -8,8 +8,12 @@
 #include "encoding.h"
 
 int main() {
-    setlocale(LC_ALL, "");
-    std::cout << "LC_CTYPE: " << setlocale(LC_CTYPE, NULL) << std::endl;
+	std::wcout.sync_with_stdio(false);
+#if defined(_WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
+#else
+	std::locale::global(std::locale(""));
+#endif
+	std::wcout.imbue(std::locale(""));
 
     std::wstring wstr = L"测试所以这样就可以了吧，。……今天。，！";
     std::string str;

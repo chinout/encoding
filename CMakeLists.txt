@@ -55,9 +55,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
-include_directories(./src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SOURCE_FILES)
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 
-ADD_EXECUTABLE(utf82wstr_test ${CMAKE_CURRENT_SOURCE_DIR}/src/encoding.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/utf82wstr_test.cpp)
-ADD_EXECUTABLE(wstr2utf8_test ${CMAKE_CURRENT_SOURCE_DIR}/src/encoding.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/wstr2utf8_test.cpp)
+ADD_EXECUTABLE(utf82wstr_test ${SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/test/utf82wstr_test.cpp)
+ADD_EXECUTABLE(wstr2utf8_test ${SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/test/wstr2utf8_test.cpp)
+
+if(APPLE)
+    TARGET_LINK_LIBRARIES(utf82wstr_test iconv)
+    TARGET_LINK_LIBRARIES(utf82wstr_test charset)
+endif(APPLE)
+
+if(APPLE)
+    TARGET_LINK_LIBRARIES(wstr2utf8_test iconv)
+    TARGET_LINK_LIBRARIES(wstr2utf8_test charset)
+endif(APPLE)
