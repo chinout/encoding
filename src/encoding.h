@@ -1,3 +1,5 @@
+#ifndef YU_ENCODING_H_
+
 #include <string>
 
 namespace yu {
@@ -19,3 +21,5 @@ bool UTF82Wstr(const std::string & str, std::wstring* wstr);
 bool Wstr2UTF8(const std::wstring & wstr, std::string * str);
 
 }    // namespace yu
+
+#endif    // YU_ENCODING_H_
